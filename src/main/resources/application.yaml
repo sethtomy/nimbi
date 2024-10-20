@@ -1,0 +1,16 @@
+spring.application.name=nimbi
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/nimbi
+spring.datasource.username=root
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=false
+
+logging.level.root=INFO
+
+management.tracing.sampling.probability=1.0
+
+d2.runewizard.token=${D2_RUNEWIZARD_TOKEN}
+
+discord.token=${DISCORD_TOKEN}

@@ -1,0 +1,20 @@
+name: nimbi
+
+services:
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  postgres:
+    image: postgres:16.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=root
+      - POSTGRES_DB=nimbi
