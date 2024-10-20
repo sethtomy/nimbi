@@ -4,7 +4,7 @@ spring:
     name: nimbi
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/nimbi
+    url: jdbc:postgresql://${DATABASE_HOST}:5432/nimbi
     username: root
     password: password
     driver-class-name: org.postgresql.Driver
