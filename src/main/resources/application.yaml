@@ -22,6 +22,9 @@ logging:
   level:
     root: INFO
 
+otel:
+  host: ${OTEL_HOST}
+
 management:
   tracing:
     sampling:
