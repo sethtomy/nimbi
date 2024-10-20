@@ -1,16 +1,35 @@
-spring.application.name=nimbi
+spring:
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/nimbi
-spring.datasource.username=root
-spring.datasource.password=password
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.jpa.hibernate.ddl-auto=create
-spring.jpa.show-sql=false
+  application:
+    name: nimbi
 
-logging.level.root=INFO
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nimbi
+    username: root
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    default-schema: public
+    locations: classpath:db/migration
 
-management.tracing.sampling.probability=1.0
+logging:
+  level:
+    root: INFO
 
-d2.runewizard.token=${D2_RUNEWIZARD_TOKEN}
+management:
+  tracing:
+    sampling:
+      probability: 1.0
 
-discord.token=${DISCORD_TOKEN}
+d2:
+  runewizard:
+    token: ${D2_RUNEWIZARD_TOKEN}
+
+discord:
+  token: ${DISCORD_TOKEN}

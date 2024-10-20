@@ -1,27 +1,34 @@
-package com.sethtomy.nimbi.diablo2.external.d2runewizard.db;
+package com.sethtomy.nimbi.diablo2.db;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
 
+@Getter
 @Entity
 @Table(name = "terror_zone")
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class TerrorZoneEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private UUID id;
 
+    @Setter
     private Date date;
 
-    private int act;
+    @Setter
+    private String act;
 
+    @Setter
     private String zone;
+
+    protected TerrorZoneEntity() {}
+
+    public TerrorZoneEntity(UUID id, Date date, String act, String zone) {
+        this.id = id;
+        this.date = date;
+        this.act = act;
+        this.zone = zone;
+    }
 }

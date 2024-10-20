@@ -1,4 +1,4 @@
-package com.sethtomy.nimbi.util.observability;
+package com.sethtomy.nimbi.common.observability;
 
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import org.springframework.context.annotation.Bean;

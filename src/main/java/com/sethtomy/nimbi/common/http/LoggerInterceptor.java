@@ -1,4 +1,4 @@
-package com.sethtomy.nimbi.util.http;
+package com.sethtomy.nimbi.common.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

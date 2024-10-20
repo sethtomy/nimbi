@@ -1,7 +1,7 @@
 package com.sethtomy.nimbi.diablo2.external.d2runewizard;
 
+import com.sethtomy.nimbi.diablo2.external.d2runewizard.dto.TerrorZoneReportDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -17,7 +17,7 @@ public class D2RuneWizardApiService {
         this.token = token;
     }
 
-    public ResponseEntity<String> getTerrorZone() {
+    public TerrorZoneReportDto getTerrorZone() {
         return restClient
           .get()
           .uri(uriBuilder -> uriBuilder
@@ -25,6 +25,6 @@ public class D2RuneWizardApiService {
             .queryParam("token", token)
             .build())
           .retrieve()
-          .toEntity(String.class);
+          .body(TerrorZoneReportDto.class);
     }
 }

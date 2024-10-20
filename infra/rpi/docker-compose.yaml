@@ -18,3 +18,12 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=root
       - POSTGRES_DB=nimbi
+
+  nimbi:
+    depends_on:
+      - postgres
+    env_file:
+      - path: ./.env
+        required: true
+    build:
+      context: ../..

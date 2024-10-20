@@ -1,35 +1,28 @@
 package com.sethtomy.nimbi.diablo2.db;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.util.UUID;
 
+@Getter
 @Entity
-@Table(name = "terror_zone")
-public class InstalledChannelEntity {
+@Table(name = "d2_installed_channel")
+public class Diablo2InstalledChannelEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private String channelId;
 
-    @Getter
     @Setter
-    private Date date;
+    @Column
+    @Nullable
+    private UUID lastCurrentTerrorZoneIdSent;
 
-    @Getter
     @Setter
-    private String act;
+    @Column
+    @Nullable
+    private UUID lastNextTerrorZoneIdSent;
 
-    @Getter
-    @Setter
-    private String zone;
-
-    protected InstalledChannelEntity() {}
-
-    public InstalledChannelEntity(Date date, String act, String zone) {
-        this.date = date;
-        this.act = act;
-        this.zone = zone;
-    }
+    protected Diablo2InstalledChannelEntity() {}
 }
