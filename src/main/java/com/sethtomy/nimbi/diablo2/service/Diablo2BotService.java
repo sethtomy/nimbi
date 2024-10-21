@@ -35,7 +35,7 @@ public class Diablo2BotService {
 
     @PostConstruct
     @Scheduled(cron = "0 */1 * * * *")
-    private void sendCurrentTerrorZoneMessage() {
+    public void sendCurrentTerrorZoneMessage() {
         Iterable<Diablo2InstalledChannelEntity> entities = repository.findAll();
         TerrorZone terrorZone = readService.getCurrentTerrorZone().orElseThrow();
         entities.forEach(entity -> {
@@ -53,20 +53,23 @@ public class Diablo2BotService {
 
     @PostConstruct
     @Scheduled(cron = "0 */1 * * * *")
-    private void sendNextTerrorZoneMessage() {
-        Iterable<Diablo2InstalledChannelEntity> entities = repository.findAll();
-        TerrorZone terrorZone = readService.getNextTerrorZone().orElseThrow();
-        entities.forEach(entity -> {
-            UUID id = entity.getLastNextTerrorZoneIdSent();
-            if (id == null || !id.equals(terrorZone.id())) {
-                logger.info("Sending latest next to Channel {}", entity.getChannelId());
-                sendMessage(entity.getChannelId(), terrorZone, "Next Terror Zone");
-                entity.setLastNextTerrorZoneIdSent(terrorZone.id());
-                repository.save(entity);
-            } else {
-                logger.info("Channel {} already has latest next, skipping.", entity.getChannelId());
-            }
-        });
+    public void sendNextTerrorZoneMessage() {
+        if (readService.getNextTerrorZone().isPresent()) {
+            Iterable<Diablo2InstalledChannelEntity> entities = repository.findAll();
+            TerrorZone terrorZone = readService.getNextTerrorZone().get();
+            entities.forEach(entity -> {
+                UUID id = entity.getLastNextTerrorZoneIdSent();
+                if (id == null || !id.equals(terrorZone.id())) {
+                    logger.info("Sending latest next to Channel {}", entity.getChannelId());
+                    sendMessage(entity.getChannelId(), terrorZone, "Next Terror Zone");
+                    entity.setLastNextTerrorZoneIdSent(terrorZone.id());
+                    repository.save(entity);
+                } else {
+                    logger.info("Channel {} already has latest next, skipping.", entity.getChannelId());
+                }
+            });
+        }
+
     }
 
     private void sendMessage(String channelId, TerrorZone terrorZone, String title) {

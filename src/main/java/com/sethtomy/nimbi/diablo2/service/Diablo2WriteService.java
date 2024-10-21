@@ -51,6 +51,7 @@ public class Diablo2WriteService {
             if (isNewTerrorZone(optional.get(), terrorZones.a)) {
                 saveToDatabase(terrorZones.a, terrorZones.b);
                 updateReadService(terrorZones.a, terrorZones.b);
+                logger.info("Terror Zones updated in database.");
             } else {
                 logger.info("Terror Zone is the same, no need to update");
             }
@@ -59,25 +60,21 @@ public class Diablo2WriteService {
         }
     }
 
-    @Scheduled(cron = "30 59 * * * *")
-    public void preSetNextTerrorZone() {
+    @Scheduled(cron = "58 59 * * * *")
+    public void preSendNextTerrorZone() {
         readService.setCurrentTerrorZone(readService.getNextTerrorZone().orElseThrow());
         readService.setNextTerrorZone(Optional.empty());
     }
 
     private boolean needsRefresh(TerrorZone currentTerrorZone) {
         LocalDateTime dateTime = LocalDateTime.now();
-        // if it's been over a day
-        if (currentTerrorZone.dateTime().isBefore(dateTime.minusDays(1))) {
-            return true;
-        }
-        return dateTime.getHour() - currentTerrorZone.dateTime().getHour() > 0;
+        return currentTerrorZone.dateTime().plusHours(1).isBefore(dateTime);
     }
 
     private boolean isNewTerrorZone(TerrorZone a, TerrorZone b) {
         boolean isSameZone = a.zone().equals(b.zone());
         boolean isSameAct = a.act() == b.act();
-        return isSameAct && isSameZone;
+        return !(isSameAct && isSameZone);
     }
 
     private void updateReadService(TerrorZone currentTerrorZone, TerrorZone nextTerrorZone) {
