@@ -21,7 +21,7 @@ public class Diablo2Controller {
 
     @GetMapping("/diablo-2/terror-zone")
     public TerrorZone getTerrorZone() {
-        writeService.updateDatabaseWithLatestTerrorZone();
+        writeService.updateDatabaseWithLatestTerrorZones();
         Optional<TerrorZone> optional = readService.getCurrentTerrorZone();
         return optional.orElseThrow();
     }

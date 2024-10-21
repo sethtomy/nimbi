@@ -3,20 +3,18 @@ package com.sethtomy.nimbi.diablo2.service;
 import com.sethtomy.nimbi.diablo2.db.TerrorZoneEntity;
 import com.sethtomy.nimbi.diablo2.db.TerrorZoneRepository;
 import com.sethtomy.nimbi.diablo2.domain.TerrorZone;
-import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 public class Diablo2ReadService {
+    private final Logger logger = LoggerFactory.getLogger(Diablo2ReadService.class);
     private final TerrorZoneRepository repository;
-
     public Optional<TerrorZone> currentTerrorZone;
-
-    @Setter
     public Optional<TerrorZone> nextTerrorZone;
-
     public TerrorZoneMapper mapper;
 
     public Diablo2ReadService(TerrorZoneRepository repository, TerrorZoneMapper mapper) {
@@ -35,6 +33,12 @@ public class Diablo2ReadService {
 
     public void setCurrentTerrorZone(TerrorZone terrorZone) {
         currentTerrorZone = Optional.of(terrorZone);
+        logger.info("Set current Terror Zone to {}", terrorZone);
+    }
+
+    public void setNextTerrorZone(Optional<TerrorZone> optional) {
+        currentTerrorZone = optional;
+        logger.info("Set next Terror Zone to {}", optional.orElse(null));
     }
 
     public Optional<TerrorZone> getNextTerrorZone() {

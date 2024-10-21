@@ -38,48 +38,56 @@ public class Diablo2WriteService {
 
     @PostConstruct
     @Scheduled(cron = "0 */1 * * * *")
-    public void updateDatabaseWithLatestTerrorZone() {
-        Optional<TerrorZone> optional = readService.getCurrentTerrorZone();
-        if (optional.isEmpty()) {
-            logger.info("No entries in database, bootstrapping from D2 Rune Wizard");
-            Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
-            saveToDatabase(terrorZones.a, terrorZones.b);
-            updateReadService(terrorZones.a, terrorZones.b);
-        } else if (needsRefresh(optional.get())) {
-            logger.info("Terror Zone needs a refresh from D2 Rune Wizard");
-            Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
-            if (isNewTerrorZone(optional.get(), terrorZones.a)) {
-                saveToDatabase(terrorZones.a, terrorZones.b);
-                updateReadService(terrorZones.a, terrorZones.b);
-                logger.info("Terror Zones updated in database.");
-            } else {
-                logger.info("Terror Zone is the same, no need to update");
-            }
+    public void updateDatabaseWithLatestTerrorZones() {
+        Optional<TerrorZone> currentOptional = readService.getCurrentTerrorZone();
+        Optional<TerrorZone> nextOptional = readService.getNextTerrorZone();
+        if (currentOptional.isEmpty()) {
+            setBoth();
+        } else if (needsRefresh(currentOptional.get(), nextOptional)) {
+            conditionallySetBoth(currentOptional.get(), nextOptional);
         } else {
             logger.info("Terror Zone already up to date, no need to query externally.");
         }
     }
 
-    @Scheduled(cron = "58 59 * * * *")
-    public void preSendNextTerrorZone() {
-        readService.setCurrentTerrorZone(readService.getNextTerrorZone().orElseThrow());
-        readService.setNextTerrorZone(Optional.empty());
+    private void setBoth() {
+        logger.info("No entries in database, bootstrapping from D2 Rune Wizard");
+        Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
+        saveCurrentToDatabase(terrorZones.a);
+        readService.setCurrentTerrorZone(terrorZones.a);
+        readService.setNextTerrorZone(Optional.of(terrorZones.b));
     }
 
-    private boolean needsRefresh(TerrorZone currentTerrorZone) {
+    private void conditionallySetBoth(TerrorZone currentTerrorZone, Optional<TerrorZone> nextOptional) {
+        logger.info("Terror Zones need a refresh from D2 Rune Wizard");
+        Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
+        if (isNewTerrorZone(Optional.of(currentTerrorZone), terrorZones.a)) {
+            saveCurrentToDatabase(terrorZones.a);
+            readService.setCurrentTerrorZone(currentTerrorZone);
+        } else if (isNewTerrorZone(nextOptional, terrorZones.b)) {
+            saveNextToDatabase(terrorZones.b);
+            readService.setNextTerrorZone(nextOptional);
+        } else {
+            logger.info("Terror Zones are the same, no need to update");
+        }
+    }
+
+    private boolean needsRefresh(TerrorZone currentTerrorZone, Optional<TerrorZone> nextTerrorZone) {
+        // This happens when we pre-send the next terror zone as the current
+        if (nextTerrorZone.isEmpty()) {
+            return true;
+        }
         LocalDateTime dateTime = LocalDateTime.now();
         return currentTerrorZone.dateTime().plusHours(1).isBefore(dateTime);
     }
 
-    private boolean isNewTerrorZone(TerrorZone a, TerrorZone b) {
-        boolean isSameZone = a.zone().equals(b.zone());
-        boolean isSameAct = a.act() == b.act();
+    private boolean isNewTerrorZone(Optional<TerrorZone> optional, TerrorZone b) {
+        if (optional.isEmpty()) {
+            return true;
+        }
+        boolean isSameZone = optional.get().zone().equals(b.zone());
+        boolean isSameAct = optional.get().act() == b.act();
         return !(isSameAct && isSameZone);
-    }
-
-    private void updateReadService(TerrorZone currentTerrorZone, TerrorZone nextTerrorZone) {
-        readService.setCurrentTerrorZone(currentTerrorZone);
-        readService.setNextTerrorZone(Optional.of(nextTerrorZone));
     }
 
     private Pair<TerrorZone, TerrorZone> getFromD2RuneWizard() {
@@ -91,10 +99,13 @@ public class Diablo2WriteService {
         return new Pair<>(currentTerrorZone, nextTerrorZone);
     }
 
-    private void saveToDatabase(TerrorZone currentTerrorZone, TerrorZone nextTerrorZone) {
-        TerrorZoneEntity currentEntity = mapper.domainToEntity(currentTerrorZone);
-        TerrorZoneEntity nextEntity = mapper.domainToEntity(nextTerrorZone);
+    private void saveCurrentToDatabase(TerrorZone terrorZone) {
+        TerrorZoneEntity currentEntity = mapper.domainToEntity(terrorZone);
         repository.save(currentEntity);
+    }
+
+    private void saveNextToDatabase(TerrorZone terrorZone) {
+        TerrorZoneEntity nextEntity = mapper.domainToEntity(terrorZone);
         repository.save(nextEntity);
     }
 }
