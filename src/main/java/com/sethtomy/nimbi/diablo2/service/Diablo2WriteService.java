@@ -67,7 +67,11 @@ public class Diablo2WriteService {
 
     private boolean needsRefresh(TerrorZone currentTerrorZone) {
         LocalDateTime dateTime = LocalDateTime.now();
-        return dateTime.getHour() - currentTerrorZone.dateTime().getHour() < 0;
+        // if it's been over a day
+        if (currentTerrorZone.dateTime().isBefore(dateTime.minusDays(1))) {
+            return true;
+        }
+        return dateTime.getHour() - currentTerrorZone.dateTime().getHour() > 0;
     }
 
     private boolean isNewTerrorZone(TerrorZone a, TerrorZone b) {
