@@ -3,10 +3,12 @@ package com.sethtomy.nimbi.diablo2.service;
 import com.sethtomy.nimbi.diablo2.db.TerrorZoneEntity;
 import com.sethtomy.nimbi.diablo2.db.TerrorZoneRepository;
 import com.sethtomy.nimbi.diablo2.domain.TerrorZone;
+import org.antlr.v4.runtime.misc.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -52,10 +54,15 @@ public class Diablo2ReadService {
         TerrorZoneEntity[] terrorZones = repository.getLastTwoTerrorZones();
         assert terrorZones.length == 2 || terrorZones.length == 0;
         if (terrorZones.length == 2) {
+            LocalDateTime dateTime = LocalDateTime.now();
             TerrorZone currentTerrorZone = mapper.entityToDomain(terrorZones[0]);
-            setCurrentTerrorZone(currentTerrorZone);
             TerrorZone nextTerrorZone = mapper.entityToDomain(terrorZones[1]);
-            setNextTerrorZone(Optional.of(nextTerrorZone));
+            if (dateTime.isAfter(currentTerrorZone.dateTime()) && dateTime.isBefore(nextTerrorZone.dateTime())) {
+                setCurrentTerrorZone(currentTerrorZone);
+            }
+            if (dateTime.isBefore(nextTerrorZone.dateTime())) {
+                setNextTerrorZone(Optional.of(nextTerrorZone));
+            }
         }
     }
 }
