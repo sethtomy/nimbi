@@ -37,7 +37,7 @@ public class Diablo2ReadService {
     }
 
     public void setNextTerrorZone(Optional<TerrorZone> optional) {
-        currentTerrorZone = optional;
+        nextTerrorZone = optional;
         logger.info("Set next Terror Zone to {}", optional.orElse(null));
     }
 

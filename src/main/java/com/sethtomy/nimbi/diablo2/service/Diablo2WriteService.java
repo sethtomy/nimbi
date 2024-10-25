@@ -53,20 +53,17 @@ public class Diablo2WriteService {
     private void setBoth() {
         logger.info("No entries in database, bootstrapping from D2 Rune Wizard");
         Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
-        saveCurrentToDatabase(terrorZones.a);
-        readService.setCurrentTerrorZone(terrorZones.a);
-        readService.setNextTerrorZone(Optional.of(terrorZones.b));
+        persistCurrent(terrorZones.a);
+        persistNext(terrorZones.b);
     }
 
     private void conditionallySetBoth(TerrorZone currentTerrorZone, Optional<TerrorZone> nextOptional) {
         logger.info("Terror Zones need a refresh from D2 Rune Wizard");
         Pair<TerrorZone, TerrorZone> terrorZones = getFromD2RuneWizard();
         if (isNewTerrorZone(Optional.of(currentTerrorZone), terrorZones.a)) {
-            saveCurrentToDatabase(terrorZones.a);
-            readService.setCurrentTerrorZone(currentTerrorZone);
+            persistCurrent(terrorZones.a);
         } else if (isNewTerrorZone(nextOptional, terrorZones.b)) {
-            saveNextToDatabase(terrorZones.b);
-            readService.setNextTerrorZone(nextOptional);
+            persistNext(terrorZones.b);
         } else {
             logger.info("Terror Zones are the same, no need to update");
         }
@@ -99,13 +96,15 @@ public class Diablo2WriteService {
         return new Pair<>(currentTerrorZone, nextTerrorZone);
     }
 
-    private void saveCurrentToDatabase(TerrorZone terrorZone) {
+    private void persistCurrent(TerrorZone terrorZone) {
         TerrorZoneEntity currentEntity = mapper.domainToEntity(terrorZone);
         repository.save(currentEntity);
+        readService.setCurrentTerrorZone(terrorZone);
     }
 
-    private void saveNextToDatabase(TerrorZone terrorZone) {
+    private void persistNext(TerrorZone terrorZone) {
         TerrorZoneEntity nextEntity = mapper.domainToEntity(terrorZone);
         repository.save(nextEntity);
+        readService.setNextTerrorZone(Optional.of(terrorZone));
     }
 }
