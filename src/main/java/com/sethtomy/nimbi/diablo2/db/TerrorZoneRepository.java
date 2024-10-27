@@ -1,9 +1,9 @@
 package com.sethtomy.nimbi.diablo2.db;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
+
 public interface TerrorZoneRepository extends CrudRepository<TerrorZoneEntity, Long> {
-    @Query(value = "SELECT * FROM terror_zone ORDER BY date ASC LIMIT 2", nativeQuery = true)
-    TerrorZoneEntity[] getLastTwoTerrorZones();
+    TerrorZoneEntity[] findAllByStartDateGreaterThanEqualAndEndDateBefore(Date startDate, Date endDate);
 }

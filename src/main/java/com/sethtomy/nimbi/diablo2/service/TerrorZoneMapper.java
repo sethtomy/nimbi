@@ -14,12 +14,19 @@ import java.util.UUID;
 @Service
 public class TerrorZoneMapper {
     public TerrorZone dtoToDomain(TerrorZoneDto terrorZoneDto, LocalDateTime dateTime) {
-        return new TerrorZone(UUID.randomUUID(), terrorZoneDto.zone(), translateAct(terrorZoneDto.act()), dateTime);
+        return new TerrorZone(
+          UUID.randomUUID(),
+          terrorZoneDto.zone(),
+          translateAct(terrorZoneDto.act()),
+          dateTime,
+          dateTime.plusHours(1)
+        );
     }
 
     public TerrorZoneEntity domainToEntity(TerrorZone terrorZone) {
-        Date date = Date.from(terrorZone.dateTime().atZone(ZoneId.systemDefault()).toInstant());
-        return new TerrorZoneEntity(terrorZone.id(), date, terrorZone.act().toString(), terrorZone.zone());
+        Date startDate = Date.from(terrorZone.startDate().atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(terrorZone.endDate().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
+        return new TerrorZoneEntity(terrorZone.id(), startDate, endDate, terrorZone.act().toString(), terrorZone.zone());
     }
 
     public TerrorZone entityToDomain(TerrorZoneEntity entity) {
@@ -27,7 +34,9 @@ public class TerrorZoneMapper {
           entity.getId(),
           entity.getZone(),
           translateAct(entity.getAct()),
-          entity.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+          entity.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
+          entity.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        );
     }
 
     private Act translateAct(String act) {

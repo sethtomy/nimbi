@@ -1,7 +1,8 @@
 CREATE TABLE terror_zone
 (
     id   UUID PRIMARY KEY,
-    date TIMESTAMP NOT NULL,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
     act  TEXT NOT NULL,
     zone TEXT NOT NULL
 );

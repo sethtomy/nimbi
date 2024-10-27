@@ -15,7 +15,10 @@ public class TerrorZoneEntity {
     private UUID id;
 
     @Setter
-    private Date date;
+    private Date startDate;
+
+    @Setter
+    private Date endDate;
 
     @Setter
     private String act;
@@ -25,9 +28,10 @@ public class TerrorZoneEntity {
 
     protected TerrorZoneEntity() {}
 
-    public TerrorZoneEntity(UUID id, Date date, String act, String zone) {
+    public TerrorZoneEntity(UUID id, Date startDate, Date endDate, String act, String zone) {
         this.id = id;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.act = act;
         this.zone = zone;
     }

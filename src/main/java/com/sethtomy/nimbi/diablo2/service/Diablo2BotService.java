@@ -36,19 +36,23 @@ public class Diablo2BotService {
     @PostConstruct
     @Scheduled(cron = "0 */1 * * * *")
     public void sendCurrentTerrorZoneMessage() {
-        Iterable<Diablo2InstalledChannelEntity> entities = repository.findAll();
-        TerrorZone terrorZone = readService.getCurrentTerrorZone().orElseThrow();
-        entities.forEach(entity -> {
-            UUID id = entity.getLastCurrentTerrorZoneIdSent();
-            if (id == null || !id.equals(terrorZone.id())) {
-                logger.info("Sending latest current to Channel {}", entity.getChannelId());
-                sendMessage(entity.getChannelId(), terrorZone, "Current Terror Zone");
-                entity.setLastCurrentTerrorZoneIdSent(terrorZone.id());
-                repository.save(entity);
-            } else {
-                logger.info("Channel {} already has latest current, skipping.", entity.getChannelId());
-            }
-        });
+        if (readService.getCurrentTerrorZone().isPresent()) {
+            Iterable<Diablo2InstalledChannelEntity> entities = repository.findAll();
+            TerrorZone terrorZone = readService.getCurrentTerrorZone().get();
+            entities.forEach(entity -> {
+                UUID id = entity.getLastCurrentTerrorZoneIdSent();
+                if (id == null || !id.equals(terrorZone.id())) {
+                    logger.info("Sending latest current to Channel {}", entity.getChannelId());
+                    sendMessage(entity.getChannelId(), terrorZone, "Current Terror Zone");
+                    entity.setLastCurrentTerrorZoneIdSent(terrorZone.id());
+                    repository.save(entity);
+                } else {
+                    logger.info("Channel {} already has latest current, skipping.", entity.getChannelId());
+                }
+            });
+        } else {
+            logger.info("Current Terror Zone is not currently set.");
+        }
     }
 
     @PostConstruct
@@ -68,8 +72,9 @@ public class Diablo2BotService {
                     logger.info("Channel {} already has latest next, skipping.", entity.getChannelId());
                 }
             });
+        } else {
+            logger.info("Next Terror Zone is not currently set.");
         }
-
     }
 
     private void sendMessage(String channelId, TerrorZone terrorZone, String title) {
